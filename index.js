@@ -23,9 +23,6 @@ class Server {
         this.app.use(express_1.default.json());
         this.app.use(express_1.default.urlencoded({ extended: false }));
         this.app.use(express_1.default.static('public'));
-        this.app.get('*', (req, res) => {
-            res.sendFile(path.resolve(__dirname, 'public/index.html'));
-        });
     }
     routes() {
         this.app.use('/', indexRoutes_1.default);
@@ -36,6 +33,10 @@ class Server {
     start() {
         this.app.listen(this.app.get('port'), () => {
             console.log('Corriendo Server on port', this.app.get('port'));
+        this.app.get('*', (req, res) => {
+            res.sendFile(path.resolve(__dirname, 'public/index.html'));
+        });
+
         });
     }
 }
