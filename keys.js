@@ -1,9 +1,9 @@
 "use strict";
 module.exports = {
     database: {
-        host: 'localhost',
-        user: 'root',
-        password: 'xUNIX..UNIX',
+        host: '35.232.205.10',
+        user: 'TIO',
+        password: '1234',
         database: 'pro2',
         multipleStatements: true
     }
