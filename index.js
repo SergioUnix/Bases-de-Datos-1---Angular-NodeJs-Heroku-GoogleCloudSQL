@@ -33,9 +33,7 @@ class Server {
     start() {
         this.app.listen(this.app.get('port'), () => {
             console.log('Corriendo Server on port', this.app.get('port'));
-        this.app.get('*', (req, res) => {
-            res.sendFile(path.resolve(__dirname, 'public/index.html'));
-        });
+
 
         });
     }
