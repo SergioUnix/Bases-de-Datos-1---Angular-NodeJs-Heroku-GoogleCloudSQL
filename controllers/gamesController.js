@@ -68,24 +68,33 @@ group by profesional.nombre order by No_inventos DESC;
     reporte3(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const games = yield pool.query(`
-    -- CONSULTA 3
-    SELECT DISTINCT frontera_pais.nombre FROM invento
-    RIGHT JOIN 
-    (
-    SELECT pais.id, pais.nombre FROM frontera
-    Right JOIN pais ON frontera.pais_id = pais.id
-    WHERE NORTE IS NULL AND SUR IS NULL AND ESTE IS NULL AND OESTE IS NULL
-    AND frontera.pais_id2 IS NULL
-    ) AS frontera_pais         ON invento.pais_id = frontera_pais.id
-    WHERE invento.pais_id IS NULL
-    order by frontera_pais.nombre;
+        -- CONSULTA 3
+        SELECT DISTINCT frontera_pais.nombre, frontera_pais.area FROM invento
+        RIGHT JOIN 
+        (
+        SELECT pais.id, pais.nombre, pais.area, pais.poblacion FROM frontera
+        Right JOIN pais ON frontera.pais_id = pais.id
+        WHERE NORTE IS NULL AND SUR IS NULL AND ESTE IS NULL AND OESTE IS NULL
+        AND frontera.pais_id2 IS NULL
+        ) AS frontera_pais         ON invento.pais_id = frontera_pais.id
+        WHERE invento.pais_id IS NULL
+        order by frontera_pais.area, frontera_pais.nombre;
          `);
             res.json(games);
         });
     }
     reporte4(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const games = yield pool.query(`
+            const games = yield pool.query(`-- CONSULTA 4
+            select consul.profe as jefe, consul.area as area, profesional.nombre as sub
+            from profe_area, profesional, area, 
+            (
+            select area.nombre as area,profesional.nombre as profe
+            from area, profesional
+            where area.Profesional_id = Profesional.id
+            ) as consul
+            where profe_area.Profesional_id = profesional.id and area.nombre=consul.area and profe_area.Area_id= Area.id
+            order by jefe, area ASC;
             
             `);
             res.json(games);
@@ -233,14 +242,16 @@ AND inventor.nombre LIKE 'BE%';
     reporte14(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const games = yield pool.query(`
--- CONSULTA 14
-SELECT encuesta.nombre, count(*) as total FROM pais_respuesta
-INNER JOIN respuesta ON pais_respuesta.respuesta_id = respuesta.id
-INNER JOIN pregunta ON respuesta.pregunta_id = pregunta.id
-INNER JOIN encuesta ON pregunta.encuesta_id = encuesta.id
-INNER JOIN pais ON pais_respuesta.pais_id = pais.id
-INNER JOIN region ON pais.region_id = region.id
-GROUP BY encuesta.nombre;
+        -- CONSULTA 14
+        SELECT total_encuestas.nombre as nombre, count(*) AS total FROM 
+        (
+            SELECT DISTINCT encuesta.nombre, pais_respuesta.Pais_id FROM pais_respuesta
+            INNER JOIN respuesta ON pais_respuesta.Respuesta_id = Respuesta.id
+            INNER JOIN pregunta ON respuesta.Pregunta_id = Pregunta.id
+            INNER JOIN encuesta ON pregunta.Encuesta_id = Encuesta.id
+        ) AS total_encuestas
+        GROUP BY total_encuestas.nombre
+        ORDER BY total DESC;
          `);
             res.json(games);
         });
